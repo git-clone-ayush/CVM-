@@ -1,0 +1,10 @@
+this text doc teaches about types of grammamr
+
+type 3- regular grsmmar
+type 2-CFG
+type 1- context sensitive grammar 
+type 0- unrestricetd grammar
+
+
+
+
