@@ -12,7 +12,10 @@ enum NodeType{
     NODE_RETURN,
     NODE_PRINT,
     NODE_INT,
-    NODE_STRING
+    NODE_STRING,
+
+    NODE_BINARY_EXPR,
+    NODE_IDENTIFIER,
 };
 
 string nodetoString(enum NodeType type){
@@ -23,6 +26,10 @@ string nodetoString(enum NodeType type){
         case NODE_PRINT: return "NODE_PRINT";
         case NODE_INT: return "NODE_INT";
         case NODE_STRING: return "NODE_STRING";
+
+        case NODE_BINARY_EXPR: return "NODE_BINARY_EXPR";
+        case NODE_IDENTIFIER: return "NODE_IDENTIFIER";
+
         default: return "UNRECOGNISED_NODE_TYPE";
     }
 }
@@ -32,6 +39,10 @@ struct ASTNode{  //Abstract Syntax Tree Node
     enum NodeType TYPE;
     string * VALUE;
     ASTNode * CHILD;
+
+    ASTNode * LEFT;
+    ASTNode * RIGHT;  //for mathematical expressions;
+
     vector<ASTNode *> SUB_STATEMENTS;
 
 
@@ -81,7 +92,8 @@ class Parser{
 
             ASTNode * newNode= new ASTNode();
             newNode->TYPE=NODE_VARIABLE;
-            newNode ->CHILD= parseINT();
+            newNode->VALUE = buffer;
+            newNode ->CHILD= parseExpression();
 
             return newNode;
             
@@ -93,7 +105,7 @@ class Parser{
 
         ASTNode * newNode= new ASTNode();
         newNode->TYPE=NODE_RETURN;
-        newNode->CHILD=parseINT();
+        newNode->CHILD = parseExpression();
         return newNode;
     }
 
@@ -143,6 +155,97 @@ class Parser{
 
             return newNode;
     }
+
+    ASTNode * parseIdentifier(){ //
+        if (current->TYPE != TOKEN_ID){
+            cout<<"[!] Syntax Error: Made a mistake Padwan\n";
+            exit(1);
+        }
+
+         ASTNode * newNode= new ASTNode();
+            newNode->TYPE=NODE_IDENTIFIER;
+            newNode ->VALUE= &current->VALUE;
+
+            proceed(TOKEN_ID);
+
+            return newNode;
+    }
+
+ ASTNode * parseFactor(){
+    if(current->TYPE == TOKEN_INT){
+        return parseINT();
+    }
+    else if(current->TYPE == TOKEN_ID){
+        return parseIdentifier();
+    }
+    else if(current->TYPE == TOKEN_LEFT_PAREN){
+        proceed(TOKEN_LEFT_PAREN);
+        ASTNode * expr = parseExpression();
+        proceed(TOKEN_RIGHT_PAREN);
+        return expr;
+    }
+    else{
+        cout<<"[!] Syntax Error: Made a mistake Padwan\n";
+        exit(1);
+    }
+}
+
+
+    ASTNode * parseTerm(){
+         ASTNode * left = parseFactor();
+
+    while (current->TYPE == TOKEN_MULTIPLY || current->TYPE == TOKEN_DIVIDE) {
+        string * op = &current->VALUE;
+
+        if (current->TYPE == TOKEN_MULTIPLY) {
+            proceed(TOKEN_MULTIPLY);
+        } else {
+            proceed(TOKEN_DIVIDE);
+        }
+
+        ASTNode * right = parseFactor();
+
+        ASTNode * newNode = new ASTNode();
+        newNode->TYPE = NODE_BINARY_EXPR;
+        newNode->VALUE = op;
+        newNode->LEFT = left;
+        newNode->RIGHT = right;
+
+        left = newNode;
+    }
+
+    return left;
+    }
+
+    ASTNode * parseExpression(){
+        ASTNode * left = parseTerm();
+
+    while (current->TYPE == TOKEN_PLUS || current->TYPE == TOKEN_MINUS) {
+        string * op = &current->VALUE;
+
+        if (current->TYPE == TOKEN_PLUS) {
+            proceed(TOKEN_PLUS);
+        } else {
+            proceed(TOKEN_MINUS);
+        }
+
+        ASTNode * right = parseTerm();
+
+        ASTNode * newNode = new ASTNode();
+        newNode->TYPE = NODE_BINARY_EXPR;
+        newNode->VALUE = op;
+        newNode->LEFT = left;
+        newNode->RIGHT = right;
+
+        left = newNode;
+    }
+
+    return left;
+    
+    
+    }
+
+
     ASTNode * parse(){
         ASTNode * root= new ASTNode();
         root->TYPE=NODE_ROOT;

@@ -14,8 +14,12 @@ enum type{
     TOKEN_KEYWORD,
     TOKEN_EOF,
     TOKEN_STRING,
-    TOKEN_QUOTES
+    TOKEN_QUOTES,
 
+    TOKEN_PLUS,
+    TOKEN_MINUS,
+    TOKEN_MULTIPLY,
+    TOKEN_DIVIDE,
 
 };
 struct Token{
@@ -172,6 +176,19 @@ public:  //public accessssible everywhere
                     tokens.push_back(tokenizespecial(TOKEN_QUOTES));
                     break;}
 
+                case '+':
+                    tokens.push_back(tokenizespecial(TOKEN_PLUS));
+                    break;
+                case '-':
+                    tokens.push_back(tokenizespecial(TOKEN_MINUS));
+                    break;
+                case '*':
+                    tokens.push_back(tokenizespecial(TOKEN_MULTIPLY));
+                    break;
+                case '/':
+                    tokens.push_back(tokenizespecial(TOKEN_DIVIDE));
+                    break;
+
                 case 0:
                 {
                     tokens.push_back(tokenizespecial(TOKEN_EOF));
@@ -224,6 +241,16 @@ string typeToString(enum type t){
             return "TOKEN_STRING";
         case TOKEN_QUOTES:
             return "TOKEN_QUOTES";
+        
+        case TOKEN_PLUS:
+            return "TOKEN_PLUS";
+        case TOKEN_MINUS:
+            return "TOKEN_MINUS";
+        case TOKEN_MULTIPLY:    
+            return "TOKEN_MULTIPLY";
+        case TOKEN_DIVIDE:
+            return "TOKEN_DIVIDE";
+
         default:
             return "UNKNOWN_TOKEN";
     }

@@ -7,6 +7,8 @@ SRef1:
 db "Hello again"
 SRef1_L :equ $-SRef1
 
+Var0: dq 0
+Var1: dq 0
 section .text
 global _start
 _start:
@@ -20,6 +22,21 @@ mov rdi, 1
 mov rsi, SRef1
 mov rdx, SRef1_L
 syscall
-mov rax ,60
-mov rdi, 6
+mov rax, 10
+mov [Var0], rax
+mov rax, 2
+mov [Var1], rax
+mov rax, [Var0]
+push rax
+mov rax, [Var1]
+mov rbx, rax
+pop rax
+imul rax, rbx
+push rax
+mov rax, 2
+mov rbx, rax
+pop rax
+add rax, rbx
+mov rdi, rax
+mov rax, 60
 syscall
