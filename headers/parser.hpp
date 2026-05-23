@@ -11,10 +11,24 @@ enum NodeType{
     NODE_VARIABLE,
     NODE_RETURN,
     NODE_PRINT,
-    NODE_INT
+    NODE_INT,
+    NODE_STRING
 };
 
-struct ASTNode{
+string nodetoString(enum NodeType type){
+    switch(type){
+        case NODE_ROOT: return "NODE_ROOT";
+        case NODE_VARIABLE: return "NODE_VARIABLE";
+        case NODE_RETURN: return "NODE_RETURN";
+        case NODE_PRINT: return "NODE_PRINT";
+        case NODE_INT: return "NODE_INT";
+        case NODE_STRING: return "NODE_STRING";
+        default: return "UNRECOGNISED_NODE_TYPE";
+    }
+}
+
+
+struct ASTNode{  //Abstract Syntax Tree Node
     enum NodeType TYPE;
     string * VALUE;
     ASTNode * CHILD;
@@ -35,7 +49,7 @@ class Parser{
 
     }
 
-    Token * proceed(enum type TYPE){
+    Token * proceed(enum type TYPE){  //to check if current token is of expected type, if not throw error 
         if(current->TYPE != TYPE){
             cout<<"[!] Syntax Error: Made a mistake Padwan\n";
             exit(1);
@@ -90,7 +104,9 @@ class Parser{
         ASTNode * newNode= new ASTNode();
         newNode->TYPE=NODE_PRINT;
         proceed(TOKEN_LEFT_PAREN);
-        newNode->CHILD=parseID();
+        proceed(TOKEN_QUOTES);
+        newNode->CHILD=parseSTRING();
+        proceed(TOKEN_QUOTES);
         proceed(TOKEN_RIGHT_PAREN);
 
         return newNode;
@@ -112,6 +128,21 @@ class Parser{
     
     
     }
+
+    ASTNode * parseSTRING(){
+        if(current->TYPE != TOKEN_STRING){
+            cout<<"[!] Syntax Error: Made a mistake Padwan\n";
+            exit(1);
+        }
+
+         ASTNode * newNode= new ASTNode();
+            newNode->TYPE=NODE_STRING;
+            newNode ->VALUE= &current->VALUE;
+
+            proceed(TOKEN_STRING);
+
+            return newNode;
+    }
     ASTNode * parse(){
         ASTNode * root= new ASTNode();
         root->TYPE=NODE_ROOT;
@@ -132,13 +163,10 @@ class Parser{
                     exit(1);
                 }
             }
-            proceed(TOKEN_SEMICOLON);
+            proceed(TOKEN_SEMICOLON); //All statement should end with semicolon, if want without it then remove , I prefer it
 
 
         }
-
-
-
 
 
         return root;
@@ -152,6 +180,8 @@ class Parser{
     vector<Token *> parsertoken;
 
 };
+
+
 
 
 

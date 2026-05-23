@@ -12,7 +12,9 @@ enum type{
     TOKEN_LEFT_PAREN,
     TOKEN_RIGHT_PAREN,
     TOKEN_KEYWORD,
-    TOKEN_EOF
+    TOKEN_EOF,
+    TOKEN_STRING,
+    TOKEN_QUOTES
 
 
 };
@@ -116,6 +118,21 @@ public:  //public accessssible everywhere
         return newToken;
     }
 
+    Token *tokenizeSTRING(){
+        stringstream buffer;
+        while (current!='"' ){
+            if(current== '\0'){
+                cout<<"LEXER eroor missing quoates\n";
+            }
+            buffer<<advance();
+        }
+        
+        Token *newToken=new Token();
+        newToken->TYPE=TOKEN_STRING;
+        newToken->VALUE=buffer.str();
+        return newToken;
+    }
+
     vector<Token *> tokenize(){
         vector<Token *> tokens;
         bool notEOF=true;
@@ -148,6 +165,12 @@ public:  //public accessssible everywhere
                 case ')':
                     tokens.push_back(tokenizespecial(TOKEN_RIGHT_PAREN));
                     break;
+
+                case '"':
+                    {tokens.push_back(tokenizespecial(TOKEN_QUOTES));
+                    tokens.push_back(tokenizeSTRING());
+                    tokens.push_back(tokenizespecial(TOKEN_QUOTES));
+                    break;}
 
                 case 0:
                 {
@@ -197,6 +220,10 @@ string typeToString(enum type t){
             return "TOKEN_KEYWORD";
         case TOKEN_EOF:
             return "TOKEN_EOF";
+        case TOKEN_STRING:
+            return "TOKEN_STRING";
+        case TOKEN_QUOTES:
+            return "TOKEN_QUOTES";
         default:
             return "UNKNOWN_TOKEN";
     }

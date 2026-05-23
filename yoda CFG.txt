@@ -1,0 +1,10 @@
+<SOURCE> -> <STATEMENT>*
+//means -A complete program (SOURCE) consists of zero or more statements.
+* means “repeat any number of times”.
+
+
+<STATEMENT> -> ID = <EXPRESSION> ;
+             | RETURN <EXPRESSION> ;
+             | PRINT (<EXPRESSION>) ;
+
+             
